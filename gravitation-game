@@ -8,6 +8,30 @@ import cocos.collision_model as cm
 import cocos.particle_systems as ps
 
 
+class ActorExplosion(ps.ParticleSystem):
+    total_particles = 400
+    duration = 0.1
+    gravity = eu.Point2(0, 0)
+    angle = 90.0
+    angle_var = 360
+    speed = 40.0
+    speed_var = 20.0
+    life = 3.0
+    life_var = 1.5
+    emission_rate = total_particles / duration
+    start_color_var = ps.Color(0.0, 0.0, 0.0, 0.2)
+    end_color = ps.Color(0.0, 0.0, 0.0, 1.0)
+    end_color_var = ps.Color(0.0, 0.0, 0.0, 0.0)
+    size = 15.0
+    size_var = 10.0
+    blend_additive = True
+
+    def __init__(self, pos, particles):
+        super(ActorExplosion, self).__init__()
+        self.position = pos
+        self.start_color = particles.start_color
+
+
 class Actor(CocosNode):
     def __init__(self, x, y, r):
         super(Actor, self).__init__()
@@ -150,3 +174,5 @@ class Enemy(Actor):
             avoid = self.position + ahead - closest
             avoid = avoid.normalized() * self.max_avoid_force
         return avoid
+
+
