@@ -36,6 +36,13 @@ class ActorExplosion(ps.ParticleSystem):
         self.start_color = particles.start_color
 
 
+def truncate(vector, m):
+    magnitude = abs(vector)
+    if magnitude > m:
+        vector *= m / magnitude
+    return vector
+
+
 class Actor(CocosNode):
     def __init__(self, x, y, r):
         super(Actor, self).__init__()
