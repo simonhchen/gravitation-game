@@ -120,7 +120,7 @@ class Player(MovingActor):
     def switch(self):
         new_dir = eu.Vector2(self.y - self.planet.y,
                              self.planet.x - self.x)
-        self.direction = new_dir.normalized() * self.linear_speed
+        self.direction = new_dir.normalized() * self.linearSpeed
         self.planet = None
         self.particles.gravity = eu.Point2(-self.direction.x,
                                            -self.direction.y)
