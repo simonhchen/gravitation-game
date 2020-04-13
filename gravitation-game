@@ -8,7 +8,6 @@ import cocos.collision_model as cm
 import cocos.particle_systems as ps
 
 
-
 class Actor(CocosNode):
     def __init__(self, x, y, r):
         super(Actor, self).__init__()
@@ -64,6 +63,35 @@ class Planet(Actor):
         self.instance.append(self)
 
 
+class Player(MovingActor):
+    def __init__(self, x, y, planet):
+        super(Player, self).__init__(x, y, 16)
+        self.planet = planet
+        self.rotation_speed =1
+        self.linear_speed = 80
+        self.direction = eu.Vector2(0, 0)
+        self.particles = ps.Meteor()
+        self.particles.size = 50
+        self.add(self.particles)
+
+    def update(self, dt):
+        if self.planet is not None:
+            super(Player, self).update(dt)
+            gx = 20 * math.cos(self.angle)
+            gy = 20 * math.sin(self.angle)
+            self.particles.gravity = eu.Point2(gx, -gy)
+        else:
+            self.position += self.direction * dt
+
+    def switch(self):
+        new_dir = eu.Vector2(self.y - self.planet.y,
+                         self.planet.x - self.x)
+        self.direction = new_dir.normalized() * self.linear_speed
+        self.planet = None
+        self.particles.gravity = eu.Point2(-self.direction.x,
+                                           -self.direction.y)
+
+
 class PickupParticles(ps.Sun):
     size = 20
     start_color = ps.Color(0.7, 0.7, 0.2, 1.0)
@@ -78,5 +106,47 @@ class Pickup(MovingActor):
         self.add(self.particles)
 
 
+class Enemy(Actor):
+    def __init__(self, x, y, target):
+        super(Enemy, self).__init__(x, y, 40)
+        self.velocity = eu.Vector2(0, 0)
+        self.speed = 2
+        self.max_force = 5
+        self.max_velocity = 30
+        self.max_ahead = 300
+        self.max_avoid_force = 500
+        self.target = target
+        self.add(ps.Sun())
+        self.schedule(self.update)
 
 
+    def update(self, dt):
+        if self.target is None:
+            return
+        distance = self.target.position - eu.Vector2(self.x, self.y)
+        steering = distance * self.speed - self.velocity
+        steering += self.avoid_force()
+        steering = truncate(steering, self.max_force)
+        self.velocity = (self.velocity + steering, self.max_velocity)
+        self.position += self.velocity * dt
+
+    def avoid_force(self):
+        avoid = eu.Vector2(0, 0)
+        ahead = self.velocity * self.max_ahead / self.max_velocity
+        l = ahead.dot(ahead)
+        if l == 0:
+            return avoid
+        closest, closest_dist = None, None
+        for obj in Planet.instances:
+            w = eu.Vector2(obj.x - self.x, obj.y - self.y)
+            t = ahead.dot(w)
+            if 0 < t < l:
+                proj = self.position + ahead * t / l
+                dist = abs(obj.cshape.r - proj)
+                if dist < obj.cshape.r and \
+                           (closest is None or dist < closest_dist):
+                            closest, closest_dist = obj.position, dist
+        if closest is not None:
+            avoid = self.position + ahead - closest
+            avoid = avoid.normalized() * self.max_avoid_force
+        return avoid
