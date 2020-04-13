@@ -95,7 +95,7 @@ class Planet(Actor):
         particles.start_color = ps.Color(0.5, 0.5, 0.5, 1.0)
         particles.size = r * 2
         self.add(particles)
-        self.instance.append(self)
+        self.instances.append(self)
 
 
 class Player(MovingActor):
