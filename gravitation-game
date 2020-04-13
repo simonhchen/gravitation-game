@@ -82,7 +82,7 @@ class MovingActor(Actor):
         dist = self._distance
         self.angle += (self.angle + self.rotationSpeed * dt) % (math.pi * 2)
         self.x = self.planet.x + dist * math.cos(self.angle)
-        self.y = self.planet.y + dist * math.sin(self.angle)
+        self.y = self.planet.y - dist * math.sin(self.angle)
 
 
 class Planet(Actor):
@@ -101,8 +101,8 @@ class Player(MovingActor):
     def __init__(self, x, y, planet):
         super(Player, self).__init__(x, y, 16)
         self.planet = planet
-        self.rotation_speed = 1
-        self.linear_speed = 80
+        self.rotationSpeed = 1
+        self.linearSpeed = 80
         self.direction = eu.Vector2(0, 0)
         self.particles = ps.Meteor()
         self.particles.size = 50
