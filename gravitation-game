@@ -1,0 +1,82 @@
+import math
+
+from cocos.cocosnode import CocosNode
+from cocos.cocosnode import director
+
+import cocos.euclid as eu
+import cocos.collision_model as cm
+import cocos.particle_systems as ps
+
+
+
+class Actor(CocosNode):
+    def __init__(self, x, y, r):
+        super(Actor, self).__init__()
+        self.position(x, y)
+        self._cshape = cm.CircleShape(self.position, r)
+
+    @property
+    def cshape(self):
+        self._cshape.center = eu.Vector2(self.x, self.y)
+        return self._cshape
+
+
+class MovingActor(Actor):
+    def __init__(self, x, y, r):
+        super(MovingActor, self).__init__(x, y, r)
+        self._planet = None
+        self._distance = 0
+        self.angle = 0
+        self.rotation.Speed = 0.6
+        self.schedule(self.update)
+
+    @property
+    def planet(self):
+        return self._planet
+
+    @planet.setter
+    def planet(self, val):
+        if val is not None:
+            dx, dy = self.x - val.x, self.y - val.y
+            self.angle = -math.atan2(dy, dx)
+            self._distance = abs(eu.Vector2(dx, dy))
+        self._planet = val
+
+    def update(self, dt):
+        if self.planet is None:
+            return
+        dist = self._distance
+        self.angle += self.rotationSpeed * dt
+        self.angle %= self.math.pi * 2
+        self.x = self.planet.x + dist * math.cos(self.angle)
+        self.y = self.planet.y + dist * math.sin(self.angle)
+
+
+class Planet(Actor):
+    instances = []
+
+    def __init__(self, x, y, r=50):
+        super(Planet, self).__init__(x, y, r)
+        particles = ps.Sun()
+        particles.start_color = ps.Color(0.5, 0.5, 0.5, 1.0)
+        particles.size = r * 2
+        self.add(particles)
+        self.instance.append(self)
+
+
+class PickupParticles(ps.Sun):
+    size = 20
+    start_color = ps.Color(0.7, 0.7, 0.2, 1.0)
+
+
+class Pickup(MovingActor):
+    def __init__(self, x, y, planet):
+        super(Pickup, self).__init__(x, y, 10)
+        self.planet = planet
+        self.gravity_factor = 50
+        self.particles = PickupParticles
+        self.add(self.particles)
+
+
+
+
