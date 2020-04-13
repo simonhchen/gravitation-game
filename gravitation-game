@@ -46,7 +46,7 @@ def truncate(vector, m):
 class Actor(CocosNode):
     def __init__(self, x, y, r):
         super(Actor, self).__init__()
-        self.position(x, y)
+        self.position = (x, y)
         self._cshape = cm.CircleShape(self.position, r)
 
     @property
