@@ -61,7 +61,7 @@ class MovingActor(Actor):
         self._planet = None
         self._distance = 0
         self.angle = 0
-        self.rotation.Speed = 0.6
+        self.rotationSpeed = 0.6
         self.schedule(self.update)
 
     @property
@@ -202,6 +202,7 @@ class GameLayer(cocos.layer.Layer):
         self.add_pickup(250, 250, planet2)
         self.add_pickup(740, 480, planet4)
         self.add_pickup(700, 60, planet5)
+        self.player = Player(300, 350, planet3)
         self.add(self.player)
         self.add(Enemy(600, 100, self.player))
         self.schedule(self.game_loop)
