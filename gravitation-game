@@ -1,7 +1,7 @@
 import math
 
 from cocos.cocosnode import CocosNode
-from cocos.cocosnode import director
+from cocos.director import director
 
 import cocos.layer
 import cocos.scene
@@ -30,10 +30,10 @@ class ActorExplosion(ps.ParticleSystem):
     size_var = 10.0
     blend_additive = True
 
-    def __init__(self, pos, particles):
+    def __init__(self, pos, color):
         super(ActorExplosion, self).__init__()
         self.position = pos
-        self.start_color = particles.start_color
+        self.start_color = color
 
 
 def truncate(vector, m):
